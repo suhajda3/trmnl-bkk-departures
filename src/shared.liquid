@@ -45,12 +45,16 @@
 {%- assign picked = "" -%}
 {%- assign any_slot = false -%}
 {%- for n in (1..4) -%}
-  {%- capture line_key -%}line_{{ n }}{%- endcapture -%}
-  {%- capture dir_key -%}direction_{{ n }}{%- endcapture -%}
-  {%- assign want = cfv[line_key] | default: "" | strip | upcase -%}
+  {%- case n -%}
+    {%- when 1 -%}{%- assign want_raw = cfv.line_1 -%}{%- assign dir_raw = cfv.direction_1 -%}
+    {%- when 2 -%}{%- assign want_raw = cfv.line_2 -%}{%- assign dir_raw = cfv.direction_2 -%}
+    {%- when 3 -%}{%- assign want_raw = cfv.line_3 -%}{%- assign dir_raw = cfv.direction_3 -%}
+    {%- else -%}{%- assign want_raw = cfv.line_4 -%}{%- assign dir_raw = cfv.direction_4 -%}
+  {%- endcase -%}
+  {%- assign want = want_raw | default: "" | strip | upcase -%}
   {%- if want == "" -%}{%- continue -%}{%- endif -%}
   {%- assign any_slot = true -%}
-  {%- assign want_dir = cfv[dir_key] | default: "" | strip | downcase | replace: "á", "a" | replace: "é", "e" | replace: "í", "i" | replace: "ó", "o" | replace: "ö", "o" | replace: "ő", "o" | replace: "ú", "u" | replace: "ü", "u" | replace: "ű", "u" -%}
+  {%- assign want_dir = dir_raw | default: "" | strip | downcase | replace: "á", "a" | replace: "é", "e" | replace: "í", "i" | replace: "ó", "o" | replace: "ö", "o" | replace: "ő", "o" | replace: "ú", "u" | replace: "ü", "u" | replace: "ű", "u" -%}
   {%- for g in groups -%}
     {%- capture want_key -%}|{{ want }}|{%- endcapture -%}
     {%- unless g.line_keys contains want_key -%}{%- continue -%}{%- endunless -%}
