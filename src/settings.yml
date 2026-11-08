@@ -1,0 +1,162 @@
+---
+strategy: polling
+no_screen_padding: 'no'
+dark_mode: 'no'
+static_data: ''
+polling_verb: get
+framework_version: 3.4.6
+serverless_language: node
+refresh_interval_floor: ''
+polling_url: "{% if location_mode contains 'top' %}https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key={{ api_key }}&stopId=BKK_{{ stop_1 | strip | upcase | remove: 'BKK_' }}&minutesAfter=90&limit=150{% else %}https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-location.json?key={{ api_key }}&lat={{ latitude }}&lon={{ longitude }}&radius={{ radius | default: 600 }}&minutesAfter=90&groupLimit=8&limit=150{% endif %}\r\n{% if location_mode contains 'top' %}{% if stop_2 != blank %}https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key={{ api_key }}&stopId=BKK_{{ stop_2 | strip | upcase | remove: 'BKK_' }}&minutesAfter=90&limit=150{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}\r\n{% if location_mode contains 'top' %}{% if stop_3 != blank %}https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key={{ api_key }}&stopId=BKK_{{ stop_3 | strip | upcase | remove: 'BKK_' }}&minutesAfter=90&limit=150{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}\r\n{% if location_mode contains 'top' %}{% if stop_4 != blank %}https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key={{ api_key }}&stopId=BKK_{{ stop_4 | strip | upcase | remove: 'BKK_' }}&minutesAfter=90&limit=150{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}"
+polling_headers: ''
+polling_body: ''
+id: 535210
+oauth_enabled: 'false'
+oauth_pkce_enabled: 'no'
+custom_fields:
+- keyname: about
+  name: About This Plugin
+  field_type: author_bio
+  category: travel
+  description: 'Real-time BKK departures in Budapest for buses, trams, trolleybuses, metro and HÉV, with how late or early each one is running. Use your location, or just pick your stops. Built for TRMNL X, works on every TRMNL. Adatok forrása: BKK Zrt., CC BY 4.0. Made by <a href=''https://github.com/suhajda3'' target=''_blank''>github.com/suhajda3</a>'
+  learn_more_url: https://opendata.bkk.hu/
+- keyname: api_key
+  field_type: password
+  name: 1. BKK API Key
+  description: Free. Register at <a href="https://opendata.bkk.hu/keys" target="_blank">opendata.bkk.hu/keys</a> and create a key.
+  placeholder: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+- keyname: location_mode
+  field_type: select
+  name: 2. Where should departures come from?
+  description: "<b>Near my location</b> shows every stop around a point you choose. <b>Specific stops</b> needs no location, just the codes of up to 4 stops."
+  options:
+  - Near my location: location
+  - Specific stops: stops
+  default: location
+  conditional_validation:
+  - when: location
+    required:
+    - latitude
+    - longitude
+    hidden:
+    - stop_1
+    - stop_2
+    - stop_3
+    - stop_4
+  - when: stops
+    required:
+    - stop_1
+    hidden:
+    - latitude
+    - longitude
+    - radius
+- keyname: latitude
+  field_type: string
+  name: Latitude
+  description: Look up your home or stop at <a href="https://www.latlong.net" target="_blank">latlong.net</a> and copy the Latitude box. Use a decimal point.
+  placeholder: '47.4963'
+  optional: true
+- keyname: longitude
+  field_type: string
+  name: Longitude
+  description: The Longitude box from <a href="https://www.latlong.net" target="_blank">latlong.net</a>.
+  placeholder: '19.0701'
+  optional: true
+- keyname: radius
+  field_type: number
+  name: Search Radius (meters)
+  description: How far around that point to look for stops. 400-600 works for most homes; go higher if a line is missing.
+  placeholder: '600'
+  default: 600
+  min: 100
+  max: 1500
+  step: 50
+  optional: true
+- keyname: stop_1
+  field_type: string
+  name: Stop 1
+  description: The stop's BKK code, for example <b>F01168</b>. Each side of the street has its own code. On <a href="https://futar.bkk.hu" target="_blank">futar.bkk.hu</a>, click your stop; the code is in its details and in the page address (BKK_F01168). <b>Check each code carefully</b> - TRMNL marks the plugin unhealthy if BKK does not know a code.
+  placeholder: F01168
+  optional: true
+- keyname: stop_2
+  field_type: string
+  name: Stop 2
+  placeholder: F01169
+  optional: true
+- keyname: stop_3
+  field_type: string
+  name: Stop 3
+  placeholder: F01291
+  optional: true
+- keyname: stop_4
+  field_type: string
+  name: Stop 4
+  placeholder: F01292
+  optional: true
+- keyname: line_1
+  field_type: string
+  name: 3. Line 1
+  description: Optional. The number on the vehicle, for example 6, 7E, M2, H5 or 105. Leave all four empty to show every line.
+  placeholder: '6'
+  optional: true
+- keyname: direction_1
+  field_type: string
+  name: Line 1 direction
+  description: Optional. Part of the destination, for example Széll or Újbuda. Empty shows both directions.
+  placeholder: Széll
+  optional: true
+- keyname: line_2
+  field_type: string
+  name: Line 2
+  placeholder: M2
+  optional: true
+- keyname: direction_2
+  field_type: string
+  name: Line 2 direction
+  placeholder: Örs
+  optional: true
+- keyname: line_3
+  field_type: string
+  name: Line 3
+  placeholder: 7E
+  optional: true
+- keyname: direction_3
+  field_type: string
+  name: Line 3 direction
+  placeholder: Újpalota
+  optional: true
+- keyname: line_4
+  field_type: string
+  name: Line 4
+  placeholder: '74'
+  optional: true
+- keyname: direction_4
+  field_type: string
+  name: Line 4 direction
+  placeholder: Csáktornya
+  optional: true
+- keyname: location_name
+  field_type: string
+  name: 4. Title
+  description: Optional. Shown in the title bar, for example Home or Blaha.
+  placeholder: Home
+  optional: true
+- keyname: walk_minutes
+  field_type: number
+  name: Walking time to the stop (minutes)
+  description: Hides departures you could not catch. With a 15-minute refresh, 3-5 works well.
+  default: 3
+  placeholder: '3'
+  min: 0
+  max: 20
+  optional: true
+- keyname: language
+  field_type: select
+  name: Screen language
+  options:
+  - English: en
+  - Magyar: hu
+  default: en
+name: BKK Departures
+description: Real-time BKK departures and delays
+refresh_interval: 15

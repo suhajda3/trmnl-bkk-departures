@@ -1,0 +1,48 @@
+{% if error %}
+<div class="layout layout--col layout--center gap">
+  <span class="title title--small">{{ t_unavailable }}</span>
+  <span class="label text--center" data-clamp="3">{{ error_message }}</span>
+</div>
+{% elsif picked_count == 0 %}
+<div class="layout layout--col layout--center gap">
+  <span class="label text--center" data-clamp="3">{% if groups.size == 0 %}{{ t_none }}{% else %}{{ t_no_match }}{% endif %}</span>
+</div>
+{% else %}
+<div class="layout">
+  <div class="grid grid--cols-2 w--full gap--large">
+    {% for i in picked limit: 4 %}
+    {% assign gi = i | plus: 0 %}
+    {% assign g = groups[gi] %}
+    <div class="grid grid--cols-12">
+      <div class="col--span-3 flex flex--col flex--center">
+        <div class="bg--black rounded px--2 py--1 text--center">
+          <span class="title title--base lg:title--large text--white">{{ g.line }}</span>
+        </div>
+      </div>
+      <div class="col--span-9 flex flex--col flex--left gap--xsmall">
+        <span class="title title--small" data-clamp="1">{{ g.headsign }}</span>
+        <div class="flex flex--row gap--large">
+        {% assign shown_deps = 0 %}
+        {% for d in g.deps %}
+          {% assign mins = d.ts | minus: now_ts | divided_by: 60 | floor %}
+          {% if mins < walk or mins < 0 or shown_deps >= 3 %}{% continue %}{% endif %}
+          {% assign shown_deps = shown_deps | plus: 1 %}
+        <div class="flex flex--col flex--left">
+          <span class="value value--xsmall lg:value--small value--tnums">{{ d.time }}</span>
+          <span class="label label--small value--tnums">{% if mins == 0 %}{{ t_now }}{% else %}{{ t_in_pre }}{{ mins }}{{ t_in_post }}{% endif %}</span>
+          {% if d.canceled %}<span class="label label--small label--inverted">{{ t_canceled }}</span>{% elsif d.realtime == false %}{% if g.type == "SUBWAY" %}<span class="label label--small">&nbsp;</span>{% else %}<span class="label label--small label--gray 1bit:text--black">{{ t_sched_short }}</span>{% endif %}{% elsif d.delay >= 3 %}<span class="label label--small label--inverted">+{{ d.delay }} {{ t_late }}</span>{% elsif d.delay >= 1 %}<span class="label label--small label--outline">+{{ d.delay }} {{ t_late }}</span>{% elsif d.delay <= -1 %}<span class="label label--small label--outline">{{ d.delay | abs }} {{ t_early }}</span>{% else %}<span class="label label--small">{{ t_on_time }}</span>{% endif %}
+        </div>
+        {% endfor %}
+        {% if shown_deps == 0 %}<span class="label label--gray 1bit:text--black">&ndash;</span>{% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+<div class="title_bar">
+  <img class="image" src="{{ title_icon }}" alt="">
+  <span class="title">{{ t_title }}</span>
+  <span class="instance">{{ place }}{% if as_of %} &middot; {{ t_updated }} {{ as_of }}{% endif %}{% if bad_stops != blank %} &middot; {{ t_bad_stop }} {{ bad_stops }}{% endif %}</span>
+</div>

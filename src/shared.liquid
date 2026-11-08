@@ -1,0 +1,76 @@
+{%- comment -%}
+  BKK Departures - shared logic. Runs before every view.
+  Picks the groups (line + destination) that match your 4 line slots, in slot
+  order, and sets up labels in English or Hungarian.
+{%- endcomment -%}
+{%- assign title_icon = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cmVjdCB4PSI1IiB5PSIyLjUiIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNSIgcng9IjMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTUgMTAuNWgxNE05IDIxbDEuNS0zLjVNMTUgMjFsLTEuNS0zLjVNOSA1LjVoNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxjaXJjbGUgY3g9IjkiIGN5PSIxNCIgcj0iMS4yIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iMTUiIGN5PSIxNCIgcj0iMS4yIiBmaWxsPSIjMDAwIi8+PC9zdmc+" -%}
+{%- assign cfv = trmnl.plugin_settings.custom_fields_values -%}
+{%- assign now_ts = trmnl.system.timestamp_utc | plus: 0 -%}
+{%- assign walk = cfv.walk_minutes | default: 0 | plus: 0 -%}
+{%- assign place = cfv.location_name | default: "" | strip -%}
+
+{%- assign lang = cfv.language | default: "english" | downcase -%}
+{%- assign is_hu = false -%}{%- if lang contains "magyar" or lang == "hu" -%}{%- assign is_hu = true -%}{%- endif -%}
+{%- if is_hu -%}
+  {%- assign t_title = "Indulások" -%}{%- assign t_in_pre = "" -%}{%- assign t_in_post = " perc múlva" -%}{%- assign t_updated = "frissítve" -%}{%- assign t_min = "perc" -%}{%- assign t_now = "most" -%}
+  {%- assign t_late = "p. késés" -%}{%- assign t_early = "p. korán" -%}{%- assign t_on_time = "pontos" -%}
+  {%- assign t_sched = "menetrend szerint" -%}{%- assign t_canceled = "kimarad" -%}{%- assign t_sched_short = "menetr." -%}
+  {%- assign t_nearby = "A közelben" -%}{%- assign t_none = "Nincs indulás a következő 90 percben." -%}
+  {%- capture t_no_stops -%}Nincs megálló {{ cfv.radius | default: 600 }} méteren belül. Adj meg egy megállóhoz közelebbi pontot, vagy növeld a keresési sugarat.{%- endcapture -%}
+  {%- assign t_no_match = "A megadott járatok nem indulnak a közelben. Ellenőrizd a járatszámokat, vagy növeld a keresési sugarat." -%}
+  {%- assign e_key = "A BKK nem fogadta el az API-kulcsot. Ellenőrizd az opendata.bkk.hu/keys oldalon." -%}
+  {%- assign e_limit = "Túl sok indulást kértél le egyszerre. Csökkentsd a keresési sugarat, vagy adj meg kevesebb megállót." -%}
+  {%- assign e_stop = "A BKK nem ismeri a megadott megállókódot. Ellenőrizd a megállókódokat (például F01168)." -%}
+  {%- assign e_none = "Nem érkezett válasz a BKK FUTÁR rendszerétől. Hamarosan újrapróbálja." -%}
+  {%- capture e_field -%}A BKK nem tudta értelmezni ezt a beállítást: „{{ error_field }}”. Ellenőrizd és mentsd el.{%- endcapture -%}
+  {%- assign t_from = "megálló:" -%}{%- assign t_bad_stop = "hibás megállókód:" -%}{%- assign t_unavailable = "Az indulások nem érhetők el" -%}
+{%- else -%}
+  {%- assign t_title = "Departures" -%}{%- assign t_in_pre = "in " -%}{%- assign t_in_post = " min" -%}{%- assign t_updated = "updated" -%}{%- assign t_min = "min" -%}{%- assign t_now = "now" -%}
+  {%- assign t_late = "late" -%}{%- assign t_early = "early" -%}{%- assign t_on_time = "on time" -%}
+  {%- assign t_sched = "scheduled" -%}{%- assign t_canceled = "cancelled" -%}{%- assign t_sched_short = "sched." -%}
+  {%- assign t_nearby = "Nearby" -%}{%- assign t_none = "No departures in the next 90 minutes." -%}
+  {%- capture t_no_stops -%}No stops within {{ cfv.radius | default: 600 }} m. Move the point closer to a stop or widen the search radius.{%- endcapture -%}
+  {%- assign t_no_match = "None of your lines leave near this spot. Check the line numbers or widen the search radius." -%}
+  {%- assign e_key = "BKK rejected the API key. Check it at opendata.bkk.hu/keys." -%}
+  {%- assign e_limit = "Too many departures for one request. Make the search radius smaller or use fewer stops." -%}
+  {%- assign e_stop = "BKK does not know this stop code. Check Stop 1-4 (for example F01168)." -%}
+  {%- assign e_none = "No response from BKK FUTÁR. It will try again soon." -%}
+  {%- capture e_field -%}BKK could not read the "{{ error_field }}" setting. Check that field and save it.{%- endcapture -%}
+  {%- assign t_from = "from" -%}{%- assign t_bad_stop = "check stop" -%}{%- assign t_unavailable = "Departures unavailable" -%}
+{%- endif -%}
+{%- if place == "" -%}{%- assign place = t_nearby -%}{%- endif -%}
+{%- if no_stops -%}{%- assign t_none = t_no_stops -%}{%- endif -%}
+
+{%- comment -%} Pick groups: slot order first, soonest first within a slot. {%- endcomment -%}
+{%- assign picked = "" -%}
+{%- assign any_slot = false -%}
+{%- for n in (1..4) -%}
+  {%- capture line_key -%}line_{{ n }}{%- endcapture -%}
+  {%- capture dir_key -%}direction_{{ n }}{%- endcapture -%}
+  {%- assign want = cfv[line_key] | default: "" | strip | upcase -%}
+  {%- if want == "" -%}{%- continue -%}{%- endif -%}
+  {%- assign any_slot = true -%}
+  {%- assign want_dir = cfv[dir_key] | default: "" | strip | downcase | replace: "á", "a" | replace: "é", "e" | replace: "í", "i" | replace: "ó", "o" | replace: "ö", "o" | replace: "ő", "o" | replace: "ú", "u" | replace: "ü", "u" | replace: "ű", "u" -%}
+  {%- for g in groups -%}
+    {%- capture want_key -%}|{{ want }}|{%- endcapture -%}
+    {%- unless g.line_keys contains want_key -%}{%- continue -%}{%- endunless -%}
+    {%- if want_dir != "" -%}
+      {%- unless g.headsign_plain contains want_dir -%}{%- continue -%}{%- endunless -%}
+    {%- endif -%}
+    {%- assign picked = picked | append: forloop.index0 | append: "," -%}
+  {%- endfor -%}
+{%- endfor -%}
+{%- unless any_slot -%}
+  {%- for g in groups limit: 8 -%}{%- assign picked = picked | append: forloop.index0 | append: "," -%}{%- endfor -%}
+{%- endunless -%}
+{%- assign picked = picked | split: "," -%}
+{%- assign picked_count = picked | size -%}
+
+{%- case error_code -%}
+  {%- when "key" -%}{%- assign error_message = e_key -%}
+  {%- when "limit" -%}{%- assign error_message = e_limit -%}
+  {%- when "stop" -%}{%- assign error_message = e_stop -%}
+  {%- when "field" -%}{%- assign error_message = e_field -%}
+  {%- when "none" -%}{%- assign error_message = e_none -%}
+  {%- when "other" -%}{%- assign error_message = error_field -%}
+{%- endcase -%}
