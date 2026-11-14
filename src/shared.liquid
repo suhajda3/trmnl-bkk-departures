@@ -41,7 +41,7 @@
 {%- if place == "" -%}{%- assign place = t_nearby -%}{%- endif -%}
 {%- if no_stops -%}{%- assign t_none = t_no_stops -%}{%- endif -%}
 
-{%- comment -%} Pick groups: slot order first, soonest first within a slot. {%- endcomment -%}
+{% comment %} Pick groups: slot order first, soonest first within a slot. {% endcomment %}
 {%- assign picked = "" -%}
 {%- assign any_slot = false -%}
 {%- for n in (1..4) -%}
