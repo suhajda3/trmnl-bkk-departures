@@ -22,13 +22,13 @@
     </div>
     <div class="col--span-9 flex flex--col flex--left gap--xsmall">
       <span class="title title--small" data-clamp="1">{{ g.headsign }}</span>
-      <div class="grid grid--cols-3">
+      <div class="grid grid--cols-3 portrait:grid--cols-2 lg:portrait:grid--cols-3">
       {% assign shown_deps = 0 %}
         {% for d in g.deps %}
           {% assign mins = d.ts | minus: now_ts | divided_by: 60 | floor %}
           {% if mins < walk or mins < 0 or shown_deps >= 3 %}{% continue %}{% endif %}
           {% assign shown_deps = shown_deps | plus: 1 %}
-        <div class="flex flex--col flex--left">
+        <div class="flex flex--col flex--left {% if shown_deps == 3 %}portrait:hidden lg:portrait:flex{% endif %}">
           <span class="value value--xsmall lg:value--small value--tnums">{{ d.time }}</span>
           <span class="label label--small value--tnums">{% if mins == 0 %}{{ t_now }}{% else %}{{ t_in_pre }}{{ mins }}{{ t_in_post }}{% endif %}</span>
           {% if d.canceled %}<span class="label label--small label--inverted">{{ t_canceled }}</span>{% elsif d.realtime == false %}{% if g.type == "SUBWAY" %}<span class="label label--small">&nbsp;</span>{% else %}<span class="label label--small label--gray 1bit:text--black">{{ t_sched_short }}</span>{% endif %}{% elsif d.delay >= 3 %}<span class="label label--small label--inverted">+{{ d.delay }} {{ t_late }}</span>{% elsif d.delay >= 1 %}<span class="label label--small label--outline">+{{ d.delay }} {{ t_late }}</span>{% elsif d.delay <= -1 %}<span class="label label--small label--outline">{{ d.delay | abs }} {{ t_early }}</span>{% else %}<span class="label label--small">{{ t_on_time }}</span>{% endif %}
