@@ -18,10 +18,10 @@
           <span class="title title--small lg:title--base text--white">{{ g.line }}</span>
         </div>
     </div>
-    <div class="col--span-4 flex flex--col flex--left flex--center-y">
-      <span class="label" data-clamp="1">{{ g.headsign }}</span>
+    <div class="col--span-4 portrait:col--span-9 flex flex--col flex--left flex--center-y">
+      <span class="label" data-clamp="1" data-clamp-lg="2">{{ g.headsign }}</span>
     </div>
-    <div class="col--span-5 flex flex--row flex--right gap--large">
+    <div class="col--span-5 portrait:col--span-12 flex flex--row flex--right portrait:flex--left gap--large">
       {% assign shown_deps = 0 %}
         {% for d in g.deps %}
           {% assign mins = d.ts | minus: now_ts | divided_by: 60 | floor %}
