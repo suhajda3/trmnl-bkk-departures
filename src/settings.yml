@@ -7,7 +7,7 @@ polling_verb: get
 framework_version: 3.4.6
 serverless_language: node
 refresh_interval_floor: ''
-polling_url: "{% if location_mode contains 'top' %}https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key={{ api_key }}&stopId=BKK_{{ stop_1 | strip | upcase | remove: 'BKK_' }}&minutesAfter=90&limit=150{% else %}https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-location.json?key={{ api_key }}&lat={{ latitude }}&lon={{ longitude }}&radius={{ radius | default: 600 }}&minutesAfter=90&groupLimit=8&limit=150{% endif %}\r\n{% if location_mode contains 'top' %}{% if stop_2 != blank %}https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key={{ api_key }}&stopId=BKK_{{ stop_2 | strip | upcase | remove: 'BKK_' }}&minutesAfter=90&limit=150{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}\r\n{% if location_mode contains 'top' %}{% if stop_3 != blank %}https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key={{ api_key }}&stopId=BKK_{{ stop_3 | strip | upcase | remove: 'BKK_' }}&minutesAfter=90&limit=150{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}\r\n{% if location_mode contains 'top' %}{% if stop_4 != blank %}https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key={{ api_key }}&stopId=BKK_{{ stop_4 | strip | upcase | remove: 'BKK_' }}&minutesAfter=90&limit=150{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}"
+polling_url: "{% if location_mode contains 'top' %}https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key={{ api_key }}&stopId=BKK_{{ stop_1 | strip | upcase | remove: 'BKK_' }}&minutesAfter=90&limit=150{% else %}https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-location.json?key={{ api_key }}&lat={{ lat_lon | split: ',' | first | strip }}&lon={{ lat_lon | split: ',' | last | strip }}&radius={{ radius | default: 600 }}&minutesAfter=90&groupLimit=8&limit=150{% endif %}\r\n  {% if location_mode contains 'top' %}{% if stop_2 != blank %}https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key={{ api_key }}&stopId=BKK_{{ stop_2 | strip | upcase | remove: 'BKK_' }}&minutesAfter=90&limit=150{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}\r\n  {% if location_mode contains 'top' %}{% if stop_3 != blank %}https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key={{ api_key }}&stopId=BKK_{{ stop_3 | strip | upcase | remove: 'BKK_' }}&minutesAfter=90&limit=150{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}\r\n  {% if location_mode contains 'top' %}{% if stop_4 != blank %}https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key={{ api_key }}&stopId=BKK_{{ stop_4 | strip | upcase | remove: 'BKK_' }}&minutesAfter=90&limit=150{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}{% else %}https://trmnl.com/custom_plugin_example_data.json{% endif %}"
 polling_headers: ''
 polling_body: ''
 id: 535210
@@ -36,8 +36,7 @@ custom_fields:
   conditional_validation:
   - when: location
     required:
-    - latitude
-    - longitude
+    - lat_lon
     hidden:
     - stop_1
     - stop_2
@@ -47,20 +46,12 @@ custom_fields:
     required:
     - stop_1
     hidden:
-    - latitude
-    - longitude
+    - lat_lon
     - radius
-- keyname: latitude
-  field_type: string
-  name: Latitude
-  description: Look up your home or stop at <a href="https://www.latlong.net" target="_blank">latlong.net</a> and copy the Latitude box. Use a decimal point.
-  placeholder: '47.4963'
-  optional: true
-- keyname: longitude
-  field_type: string
-  name: Longitude
-  description: The Longitude box from <a href="https://www.latlong.net" target="_blank">latlong.net</a>.
-  placeholder: '19.0701'
+- keyname: lat_lon
+  field_type: lat_lon
+  name: Location
+  description: Search for your address or a stop, then pick it from the list. You can also type coordinates, for example 47.4963,19.0701 for Blaha Lujza tér.
   optional: true
 - keyname: radius
   field_type: number
