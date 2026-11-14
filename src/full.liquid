@@ -13,31 +13,31 @@
   {% for i in picked limit: 6 %}
     {% assign gi = i | plus: 0 %}
     {% assign g = groups[gi] %}
-    {% if forloop.index > 4 %}{% assign only_lg = "hidden lg:grid" %}{% assign only_lg_div = "hidden lg:block" %}{% else %}{% assign only_lg = "" %}{% assign only_lg_div = "" %}{% endif %}
+    {% if forloop.index > 4 %}{% assign only_lg = "hidden lg:grid lg:portrait:hidden" %}{% assign only_lg_div = "hidden lg:block lg:portrait:hidden" %}{% else %}{% assign only_lg = "" %}{% assign only_lg_div = "" %}{% endif %}
     {% if is_hu %}{% assign type_label = g.type_hu %}{% assign alert_text = g.alert_hu %}{% else %}{% assign type_label = g.type_en %}{% assign alert_text = g.alert_en %}{% endif %}
     {% unless forloop.first %}<div class="divider {{ only_lg_div }}"></div>{% endunless %}
   <div class="grid grid--cols-12 {{ only_lg }}">
     <div class="col--span-2 flex flex--col flex--center gap--xsmall">
       <div class="bg--black rounded px--3 py--1 text--center">
-        <span class="title title--large lg:title--xlarge text--white">{{ g.line }}</span>
+        <span class="title title--large lg:title--xlarge lg:portrait:title--xxlarge text--white">{{ g.line }}</span>
       </div>
-      <span class="label label--small label--gray 1bit:text--black">{{ type_label }}</span>
+      <span class="label label--small lg:portrait:label--base label--gray 1bit:text--black">{{ type_label }}</span>
     </div>
-    <div class="col--span-4 flex flex--col flex--left flex--center-y gap--xsmall">
-      <span class="title title--small lg:title--base" data-clamp="1">{{ g.headsign }}</span>
-      {% if g.stop != "" %}<span class="label label--small label--gray 1bit:text--black" data-clamp="1">{{ t_from }} {{ g.stop }}</span>{% endif %}
-      {% if alert_text != "" %}<span class="label label--small label--outline" data-clamp="1">{{ alert_text }}</span>{% endif %}
+    <div class="col--span-4 portrait:col--span-10 flex flex--col flex--left flex--center-y gap--xsmall">
+      <span class="title title--small lg:title--base lg:portrait:title--large" data-clamp="1">{{ g.headsign }}</span>
+      {% if g.stop != "" %}<span class="label label--small lg:portrait:label--base label--gray 1bit:text--black" data-clamp="1">{{ t_from }} {{ g.stop }}</span>{% endif %}
+      {% if alert_text != "" %}<span class="label label--small lg:portrait:label--base label--outline" data-clamp="1">{{ alert_text }}</span>{% endif %}
     </div>
-    <div class="col--span-6 grid grid--cols-4">
+    <div class="col--span-6 portrait:col--span-12 grid grid--cols-4">
       {% assign shown_deps = 0 %}
         {% for d in g.deps %}
           {% assign mins = d.ts | minus: now_ts | divided_by: 60 | floor %}
           {% if mins < walk or mins < 0 or shown_deps >= 4 %}{% continue %}{% endif %}
           {% assign shown_deps = shown_deps | plus: 1 %}
         <div class="flex flex--col flex--left">
-          <span class="value value--small lg:value--base value--tnums">{{ d.time }}</span>
-          <span class="label label--small value--tnums">{% if mins == 0 %}{{ t_now }}{% else %}{{ t_in_pre }}{{ mins }}{{ t_in_post }}{% endif %}</span>
-          {% if d.canceled %}<span class="label label--small label--inverted">{{ t_canceled }}</span>{% elsif d.realtime == false %}{% if g.type == "SUBWAY" %}<span class="label label--small">&nbsp;</span>{% else %}<span class="label label--small label--gray 1bit:text--black">{{ t_sched_short }}</span>{% endif %}{% elsif d.delay >= 3 %}<span class="label label--small label--inverted">+{{ d.delay }} {{ t_late }}</span>{% elsif d.delay >= 1 %}<span class="label label--small label--outline">+{{ d.delay }} {{ t_late }}</span>{% elsif d.delay <= -1 %}<span class="label label--small label--outline">{{ d.delay | abs }} {{ t_early }}</span>{% else %}<span class="label label--small">{{ t_on_time }}</span>{% endif %}
+          <span class="value value--small lg:value--base lg:portrait:value--large value--tnums">{{ d.time }}</span>
+          <span class="label label--small lg:portrait:label--base value--tnums">{% if mins == 0 %}{{ t_now }}{% else %}{{ t_in_pre }}{{ mins }}{{ t_in_post }}{% endif %}</span>
+          {% if d.canceled %}<span class="label label--small lg:portrait:label--base label--inverted">{{ t_canceled }}</span>{% elsif d.realtime == false %}{% if g.type == "SUBWAY" %}<span class="label label--small lg:portrait:label--base">&nbsp;</span>{% else %}<span class="label label--small lg:portrait:label--base label--gray 1bit:text--black">{{ t_sched_short }}</span>{% endif %}{% elsif d.delay >= 3 %}<span class="label label--small lg:portrait:label--base label--inverted">+{{ d.delay }} {{ t_late }}</span>{% elsif d.delay >= 1 %}<span class="label label--small lg:portrait:label--base label--outline">+{{ d.delay }} {{ t_late }}</span>{% elsif d.delay <= -1 %}<span class="label label--small lg:portrait:label--base label--outline">{{ d.delay | abs }} {{ t_early }}</span>{% else %}<span class="label label--small lg:portrait:label--base">{{ t_on_time }}</span>{% endif %}
         </div>
         {% endfor %}
         {% if shown_deps == 0 %}<span class="label label--gray 1bit:text--black">&ndash;</span>{% endif %}
