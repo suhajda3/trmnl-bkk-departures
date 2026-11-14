@@ -1,8 +1,8 @@
-{%- comment -%}
+{% comment %}
   BKK Departures - shared logic. Runs before every view.
   Picks the groups (line + destination) that match your 4 line slots, in slot
   order, and sets up labels in English or Hungarian.
-{%- endcomment -%}
+{% endcomment %}
 {%- assign title_icon = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cmVjdCB4PSI1IiB5PSIyLjUiIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNSIgcng9IjMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTUgMTAuNWgxNE05IDIxbDEuNS0zLjVNMTUgMjFsLTEuNS0zLjVNOSA1LjVoNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxjaXJjbGUgY3g9IjkiIGN5PSIxNCIgcj0iMS4yIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iMTUiIGN5PSIxNCIgcj0iMS4yIiBmaWxsPSIjMDAwIi8+PC9zdmc+" -%}
 {%- assign cfv = trmnl.plugin_settings.custom_fields_values -%}
 {%- assign now_ts = trmnl.system.timestamp_utc | plus: 0 -%}
