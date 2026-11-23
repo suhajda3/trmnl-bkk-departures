@@ -9,10 +9,11 @@
 </div>
 {% else %}
 <div class="layout layout--col {% if picked_count < 3 %}layout--top gap--xlarge{% else %}gap--space-between{% endif %}">
-  {% for i in picked limit: 3 %}
+  {% for i in picked limit: 4 %}
     {% assign gi = i | plus: 0 %}
     {% assign g = groups[gi] %}
-  <div class="grid grid--cols-12">
+    {% if forloop.index > 3 %}{% assign only_lg = "hidden lg:landscape:grid" %}{% else %}{% assign only_lg = "" %}{% endif %}
+  <div class="grid grid--cols-12 {{ only_lg }}">
     <div class="col--span-3 flex flex--col flex--center">
       <div class="bg--black rounded px--2 py--1 text--center">
           <span class="title title--small lg:title--base text--white">{{ g.line }}</span>
@@ -25,10 +26,10 @@
       {% assign shown_deps = 0 %}
         {% for d in g.deps %}
           {% assign mins = d.ts | minus: now_ts | divided_by: 60 | floor %}
-          {% if mins < walk or mins < 0 or shown_deps >= 2 %}{% continue %}{% endif %}
+          {% if mins < walk or mins < 0 or shown_deps >= 3 %}{% continue %}{% endif %}
           {% assign shown_deps = shown_deps | plus: 1 %}
-        <div class="flex flex--col flex--left">
-          <span class="value value--xsmall lg:value--small value--tnums">{{ d.time }}</span>
+        <div class="flex flex--col flex--left {% if shown_deps == 3 %}hidden lg:portrait:flex{% endif %}">
+          <span class="value value--xsmall lg:value--small lg:portrait:value--base value--tnums">{{ d.time }}</span>
           {% if d.canceled %}<span class="label label--small label--inverted">{{ t_canceled }}</span>{% elsif d.realtime == false %}{% if g.type == "SUBWAY" %}<span class="label label--small">&nbsp;</span>{% else %}<span class="label label--small label--gray 1bit:text--black">{{ t_sched_short }}</span>{% endif %}{% elsif d.delay >= 3 %}<span class="label label--small label--inverted">+{{ d.delay }} {{ t_late }}</span>{% elsif d.delay >= 1 %}<span class="label label--small label--outline">+{{ d.delay }} {{ t_late }}</span>{% elsif d.delay <= -1 %}<span class="label label--small label--outline">{{ d.delay | abs }} {{ t_early }}</span>{% else %}<span class="label label--small">{{ t_on_time }}</span>{% endif %}
         </div>
         {% endfor %}
