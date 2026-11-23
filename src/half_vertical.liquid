@@ -9,10 +9,10 @@
 </div>
 {% else %}
 <div class="layout layout--col {% if picked_count < 3 %}layout--top gap--xlarge{% else %}gap--space-between{% endif %}">
-  {% for i in picked limit: 5 %}
+  {% for i in picked limit: 7 %}
     {% assign gi = i | plus: 0 %}
     {% assign g = groups[gi] %}
-    {% if forloop.index > 4 %}{% assign only_lg = "hidden lg:grid" %}{% assign only_lg_div = "hidden lg:block" %}{% else %}{% assign only_lg = "" %}{% assign only_lg_div = "" %}{% endif %}
+    {% if forloop.index > 5 %}{% assign only_lg = "hidden lg:portrait:grid" %}{% assign only_lg_div = "hidden lg:portrait:block" %}{% elsif forloop.index > 4 %}{% assign only_lg = "hidden lg:grid" %}{% assign only_lg_div = "hidden lg:block" %}{% else %}{% assign only_lg = "" %}{% assign only_lg_div = "" %}{% endif %}
     {% unless forloop.first %}<div class="divider {{ only_lg_div }}"></div>{% endunless %}
   <div class="grid grid--cols-12 {{ only_lg }}">
     <div class="col--span-3 flex flex--col flex--center">
